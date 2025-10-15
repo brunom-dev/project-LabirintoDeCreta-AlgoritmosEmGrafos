@@ -21,8 +21,8 @@ class Grafo:
             Como temos um grafo não direicionado, adicionamos 
             a aresta nos dois sentidos.
         """
-        self.lista_adj[u].append(v, peso)
-        self.lista_adj[v].append(u, peso)
+        self.lista_adj[u].append((v, peso))
+        self.lista_adj[v].append((u, peso))
 
     def __str__(self):
         """

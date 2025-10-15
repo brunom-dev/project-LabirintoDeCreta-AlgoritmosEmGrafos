@@ -30,9 +30,8 @@ def ler_labirinto(nome_arquivo):
         return labirinto, parametros
 
 
-
 try:
-    arquivo_labirinto = "labirintos/labirinto.txt"
+    arquivo_labirinto = "src/labirintos/labirinto.txt"
 
     grafo_labirinto, parametros_simulacao = ler_labirinto(arquivo_labirinto)
 
@@ -40,7 +39,7 @@ try:
     print(grafo_labirinto)
     
     print("\n--- Parâmetros da Simulação ---")
-    for chave, valor in params_simulacao.items():
+    for chave, valor in parametros_simulacao.items():
         print(f"{chave.capitalize()}: {valor}")
 
 except FileNotFoundError:
