@@ -1,4 +1,5 @@
 from app.grafo import Grafo
+import heapq
 
 def floyd_warshall(grafo: Grafo):
     """
@@ -38,3 +39,36 @@ def floyd_warshall(grafo: Grafo):
     
     return distancias, pai
 
+def dijkstra(grafo: Grafo, origem: int):
+    """
+    Algoritmo de Dijkstra otimizado com heap de prioridade.
+    Retorna:
+      distancias[v]: menor custo de origem até v
+      pai[v]: vértice predecessor de v no caminho mínimo
+    """
+    n = grafo.num_vertices
+    infinito = float("inf")
+
+    distancias = [infinito] * (n + 1)
+    pai = [None] * (n + 1)
+    distancias[origem] = 0
+    pai[origem] = origem
+
+    # Heap guarda pares (distancia, vertice)
+    heap = [(0, origem)]
+    visitado = [False] * (n + 1)
+
+    while heap:
+        dist_u, u = heapq.heappop(heap)
+        if visitado[u]:
+            continue
+        visitado[u] = True
+
+        for v, peso in grafo.lista_adj.get(u, []):
+            nova_dist = dist_u + peso
+            if nova_dist < distancias[v]:
+                distancias[v] = nova_dist
+                pai[v] = u
+                heapq.heappush(heap, (nova_dist, v))
+
+    return distancias, pai
