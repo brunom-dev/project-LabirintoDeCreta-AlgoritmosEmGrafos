@@ -29,3 +29,45 @@ class Minotauro:
         # --- Atributos de Configuração ---
         self.percepcao = parametro_percepcao
         self.grafo = grafo_labirinto
+
+class Prisioneiro: 
+    """
+        Representa o prisioneiro, seu estado e sua lógica de movimento.
+    """
+
+    def __init__(self, posicao_inicial):
+        self.posicao_atual = posicao_inicial
+        # vertices ja visitados.
+        self.visitados = {posicao_inicial}
+        # pilha para usar como novelo de lâ
+        self.caminho_percorrido = [posicao_inicial]
+        # historico de movimentos
+        self.sequencia_de_movimentos = [posicao_inicial]
+
+
+    def mover(self, grafo: Grafo):
+        vizinhos = grafo.lista_adj[self.posicao_atual]
+
+        for vizinho, peso in vizinhos:
+            if vizinho not in self.visitados:
+                self.posicao_atual = vizinho
+                self.visitados.add(vizinho)
+                self.caminho_percorrido.append(vizinho)
+                self.sequencia_de_movimentos.append(vizinho)
+                return peso # retorna o "tempo" gasto para se mover
+            
+        if len(self.caminho_percorrido) > 1:
+            self.caminho_percorrido.pop()
+            posicao_anterior = self.caminho_percorrido[-1]
+
+            peso_retorno = 0
+            for vizinho, peso in grafo.lista_adj[self.posicao_atual]:
+                if vizinho == posicao_anterior:
+                    peso_retorno = peso
+                    break
+            
+            self.posicao_atual = posicao_anterior;
+            self.sequencia_de_movimentos.append(self.posicao_atual)
+            return peso_retorno
+        
+        return 0 # Está preso (grafo desconexo) ou ja percorreu todos os vertices.
