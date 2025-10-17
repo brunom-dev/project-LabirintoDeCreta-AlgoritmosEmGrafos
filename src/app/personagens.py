@@ -22,41 +22,51 @@ class Minotauro:
         self.movimento_da_rodada = [] # Guarda o caminho percorrido na rodada atual
 
         self.caminho_perseguicao_completo = []
+        self.posicao_do_prisioneiro_no_inicio_da_perseguicao = None
 
     def mover(self, prisioneiro: 'Prisioneiro') -> None:
         """
-        Executa a lógica de movimento do Minotauro para a rodada.
-        Primeiro, verifica se o prisioneiro está dentro do alcance de percepção.
-        Depois, move-se de acordo com o estado (patrulha ou perseguição).
+        Executa a lógica de movimento do Minotauro para a rodada atual.
+        
+        Primeiro calcula a distância até o prisioneiro e determina se deve
+        entrar em modo de perseguição. Em seguida, move-se de acordo com
+        o estado atual (patrulha ou perseguição).
         """
-        #   guarda o estado anterior
+        # Salva o estado anterior para detectar mudanças de comportamento
         estava_perseguindo = self.em_perseguicao
 
+        # Calcula distâncias e caminhos mínimos usando algoritmo de Dijkstra
         distancias, predecessores = dijkstra(self.grafo, self.posicao_atual)
-        distancia_ate_prisioneiro = distancias[prisioneiro.posicao_atual]
+        self.distancia_ate_prisioneiro = distancias[prisioneiro.posicao_atual]
 
-        # 2. Decisão de Estado
-        # A detecção ocorre se a distância (soma dos pesos) for menor ou igual ao parâmetro. 
+        # Determina se o minotauro está em estado de percepção
         self._is_em_perseguicao()
 
-
-        if self.em_perseguicao and not estava_perseguindo:       # se começou a perseguir agora
-            # Inicializa a lista com a posição de onde ele começou a perseguir.
+        # Gerencia início e fim da perseguição para o relatório
+        if self.em_perseguicao and not estava_perseguindo:
+            # Iniciou perseguição: registra posição inicial e do prisioneiro
             self.caminho_perseguicao_completo = [self.posicao_atual]
-        elif not self.em_perseguicao and estava_perseguindo:     # a perseguição acabou
-            # Reseta a lista, pois a perseguição acabou.
+            self.posicao_do_prisioneiro_no_inicio_da_perseguicao = prisioneiro.posicao_atual
+        elif not self.em_perseguicao and estava_perseguindo:
+            # Terminou perseguição: limpa dados de rastreamento
             self.caminho_perseguicao_completo = []
+            self.posicao_do_prisioneiro_no_inicio_da_perseguicao = None
 
-
-        # 3. Execução do Movimento
+        # Executa movimento baseado no estado atual
         if self.em_perseguicao:
+            # Modo perseguição: segue caminho mínimo até o prisioneiro
             caminho_minimo = self._reconstruir_caminho(predecessores, prisioneiro.posicao_atual)
             self._mover_perseguindo(caminho_minimo)
             self.caminho_perseguicao_completo.extend(self.movimento_da_rodada)
         else:
+            # Modo patrulha: movimento aleatório
             self._mover_patrulhando()
 
     def _is_em_perseguicao(self):
+        """
+        Determina se o Minotauro deve entrar em modo de perseguição
+        baseado na distância até o prisioneiro e seu alcance de percepção.
+        """
         if self.distancia_ate_prisioneiro <= self.percepcao:
             self.em_perseguicao = True
         else:
