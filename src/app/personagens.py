@@ -21,28 +21,46 @@ class Minotauro:
         self.em_perseguicao = False
         self.movimento_da_rodada = [] # Guarda o caminho percorrido na rodada atual
 
+        self.caminho_perseguicao_completo = []
+
     def mover(self, prisioneiro: 'Prisioneiro') -> None:
         """
         Executa a lógica de movimento do Minotauro para a rodada.
         Primeiro, verifica se o prisioneiro está dentro do alcance de percepção.
         Depois, move-se de acordo com o estado (patrulha ou perseguição).
         """
+        #   guarda o estado anterior
+        estava_perseguindo = self.em_perseguicao
+
         distancias, predecessores = dijkstra(self.grafo, self.posicao_atual)
         distancia_ate_prisioneiro = distancias[prisioneiro.posicao_atual]
 
         # 2. Decisão de Estado
         # A detecção ocorre se a distância (soma dos pesos) for menor ou igual ao parâmetro. 
-        if distancia_ate_prisioneiro <= self.percepcao:
-            self.em_perseguicao = True
-        else:
-            self.em_perseguicao = False
+        self._is_em_perseguicao()
+
+
+        if self.em_perseguicao and not estava_perseguindo:       # se começou a perseguir agora
+            # Inicializa a lista com a posição de onde ele começou a perseguir.
+            self.caminho_perseguicao_completo = [self.posicao_atual]
+        elif not self.em_perseguicao and estava_perseguindo:     # a perseguição acabou
+            # Reseta a lista, pois a perseguição acabou.
+            self.caminho_perseguicao_completo = []
+
 
         # 3. Execução do Movimento
         if self.em_perseguicao:
             caminho_minimo = self._reconstruir_caminho(predecessores, prisioneiro.posicao_atual)
             self._mover_perseguindo(caminho_minimo)
+            self.caminho_perseguicao_completo.extend(self.movimento_da_rodada)
         else:
             self._mover_patrulhando()
+
+    def _is_em_perseguicao(self):
+        if self.distancia_ate_prisioneiro <= self.percepcao:
+            self.em_perseguicao = True
+        else:
+            self.em_perseguicao = False
 
     def _reconstruir_caminho(self, predecessores: list[int], destino: int) -> list[int]:
         """
