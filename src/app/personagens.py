@@ -8,7 +8,7 @@ class Minotauro:
 
     Esta classe controla a posição, o estado (patrulhando ou perseguindo)
     e as ações do Minotauro a cada rodada, utilizando seu conhecimento completo
-    do labirinto para caçar o prisioneiro.
+    do labirinto para caçarr o prisioneiro.
     """
 
     def __init__(self, posicao_inicial: int, parametro_percepcao: float, grafo_labirinto: Grafo):
