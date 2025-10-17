@@ -41,34 +41,53 @@ def floyd_warshall(grafo: Grafo):
 
 def dijkstra(grafo: Grafo, origem: int):
     """
-    Algoritmo de Dijkstra otimizado com heap de prioridade.
-    Retorna:
-      distancias[v]: menor custo de origem até v
-      pai[v]: vértice predecessor de v no caminho mínimo
+    Algoritmo de Dijkstra otimizado com heap de prioridade (Min-Heap).
+    Encontra o caminho de menor custo (distância) da 'origem' para todos os outros vértices.
     """
+    
+    # 1. Inicialização de Estruturas
     n = grafo.num_vertices
     infinito = float("inf")
 
+    # Arrays de resultados: Distância inicial infinita e pai (predecessor) nulo
     distancias = [infinito] * (n + 1)
     pai = [None] * (n + 1)
+    
+    # Define a distância da origem para ela mesma como 0
     distancias[origem] = 0
     pai[origem] = origem
 
-    # Heap guarda pares (distancia, vertice)
+    # Min-Heap: Armazena (distancia, vertice). A menor distância tem prioridade.
     heap = [(0, origem)]
+    
+    # Controle de vértices processados (otimização para evitar re-processamento)
     visitado = [False] * (n + 1)
 
+    # 2. Laço Principal de Dijkstra
     while heap:
+        # Extrai o vértice 'u' com a menor distância atual (propriedade do Min-Heap)
         dist_u, u = heapq.heappop(heap)
+        
+        # Se 'u' já foi extraído e processado anteriormente, ignora esta cópia
         if visitado[u]:
             continue
+            
+        # Marca 'u' como processado, garantindo que sua distância final foi determinada
         visitado[u] = True
 
+        # 3. Relaxamento das Arestas
+        # Itera sobre todos os vizinhos 'v' de 'u'
         for v, peso in grafo.lista_adj.get(u, []):
             nova_dist = dist_u + peso
+            
+            # Teste de Relaxamento: Se encontrou um caminho mais curto para 'v' através de 'u'
             if nova_dist < distancias[v]:
+                # Atualiza a menor distância e o predecessor
                 distancias[v] = nova_dist
                 pai[v] = u
+                
+                # Insere 'v' no heap com sua nova e menor distância
+                # O heap garante que 'v' será processado na ordem correta
                 heapq.heappush(heap, (nova_dist, v))
 
     return distancias, pai
