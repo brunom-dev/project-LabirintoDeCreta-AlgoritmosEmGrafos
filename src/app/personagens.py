@@ -44,6 +44,7 @@ class Minotauro:
 
         # Gerencia início e fim da perseguição para o relatório
         if self.em_perseguicao and not estava_perseguindo:
+            print("\n\n(Perseguição iniciou-se)")
             # Iniciou perseguição: registra posição inicial e do prisioneiro
             self.caminho_perseguicao_completo = [self.posicao_atual]
             self.posicao_do_prisioneiro_no_inicio_da_perseguicao = prisioneiro.posicao_atual
@@ -51,6 +52,7 @@ class Minotauro:
             # Terminou perseguição: limpa dados de rastreamento
             self.caminho_perseguicao_completo = []
             self.posicao_do_prisioneiro_no_inicio_da_perseguicao = None
+            print("\n\n(Perseguição encerrou-se)")
 
         # Executa movimento baseado no estado atual
         if self.em_perseguicao:
